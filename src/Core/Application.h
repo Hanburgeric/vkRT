@@ -4,11 +4,16 @@
 // STL
 #include <memory>
 
-// SDL
-#include "SDL3/SDL.h"
-
 // src
-#include "../Renderer/RendererInterface.h"
+#include "../Platform/Platform.h"
+#include "../Platform/PlatformTypes.h"
+#include "../Renderer/Renderer.h"
+#include "../Renderer/RendererTypes.h"
+
+// Forward declarations
+namespace vkrt::platform{ class Platform; }
+namespace vkrt::renderer{ class Renderer; }
+struct ImGuiContext;
 
 namespace vkrt {
 
@@ -21,24 +26,22 @@ public:
   void Shutdown();
 
 private:
-  bool InitializeSdl();
+  bool InitializePlatform();
   bool InitializeRenderer();
   bool InitializeImGui();
 
-  void ShutdownSdl();
+  void ShutdownPlatform();
   void ShutdownRenderer();
   void ShutdownImGui();
 
-  void HandleEvents();
-  void UpdatePhysics();
-  void RenderViewport();
-
 private:
-  SDL_Window* window_;
-  std::unique_ptr<renderer::Interface> renderer_;
-  bool should_quit_;
+  platform::Type platform_type_;
+  std::unique_ptr<platform::Platform> platform_;
+
+  renderer::Type renderer_type_;
+  std::unique_ptr<renderer::Renderer> renderer_;
 };
 
-}
+}  // namespace vkrt
 
-#endif //APPLICATION_H
+#endif // APPLICATION_H

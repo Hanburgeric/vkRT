@@ -15,9 +15,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
 # ======================================================================
 # Dependencies
 # ======================================================================
-find_package(Vulkan)
+find_package(Vulkan REQUIRED)
+find_package(OpenGL REQUIRED)
 
 include(FetchContent)
+
+FetchContent_Declare(
+    glfw            # 3.4
+    GIT_REPOSITORY  https://github.com/glfw/glfw.git
+    GIT_TAG         7b6aead9fb88b3623e3b3725ebb42670cbe4c579
+)
 
 FetchContent_Declare(
     glm             # 1.0.1
@@ -38,6 +45,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(
+    glfw
     glm
     imgui
     SDL3
@@ -48,22 +56,31 @@ FetchContent_MakeAvailable(
 # ======================================================================
 add_executable(
     ${PROJECT_NAME}
-    src/Core/Application.cpp src/Core/Application.h
+    src/Core/Application.cpp
+    src/Core/Application.h
+
     src/main.cpp
-        src/Renderer/RendererFactory.cpp
-        src/Renderer/RendererFactory.h
-        src/Renderer/RendererInterface.h
+
+    src/Platform/Platform.h
+    src/Platform/PlatformTypes.h
+    src/Platform/PlatformUtils.cpp
+    src/Platform/PlatformUtils.h
+
+    src/Renderer/Renderer.h
+    src/Renderer/RendererTypes.h
+    src/Renderer/RendererUtils.cpp
+    src/Renderer/RendererUtils.h
 )
 
 target_sources(
     ${PROJECT_NAME} PRIVATE
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.h
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h
     ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.h
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.h
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3_shaders.h
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.h
     ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.h
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
@@ -88,7 +105,9 @@ target_include_directories(
 
 target_link_libraries(
     ${PROJECT_NAME} PRIVATE
+    glfw
     glm::glm
+    OpenGL::GL
     SDL3::SDL3
     Vulkan::Vulkan
 )
