@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) {
   // Initialize application
-  Application application{};
+  vkrt::Application application{};
   if (!application.Initialize()) {
     std::cerr << "Failed to initialize application." << std::endl;
     return 1;

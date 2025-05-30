@@ -50,6 +50,9 @@ add_executable(
     ${PROJECT_NAME}
     src/Core/Application.cpp src/Core/Application.h
     src/main.cpp
+        src/Renderer/RendererFactory.cpp
+        src/Renderer/RendererFactory.h
+        src/Renderer/RendererInterface.h
 )
 
 target_sources(

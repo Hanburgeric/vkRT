@@ -2,6 +2,7 @@
 
 // STL
 #include <iostream>
+#include <memory>
 
 // SDL
 #include "SDL3/SDL.h"
@@ -11,6 +12,12 @@
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_vulkan.h"
 
+// src
+#include "../Renderer/RendererInterface.h"
+#include "../Renderer/RendererFactory.h"
+
+namespace vkrt {
+
 Application::Application()
     : window_{ nullptr }
     , should_quit_{ false } {
@@ -19,6 +26,11 @@ Application::Application()
 bool Application::Initialize() {
   // Initialize SDL
   if (!InitializeSdl()) {
+    return false;
+  }
+
+  // Initialize renderer
+  if (!InitializeRenderer()) {
     return false;
   }
 
@@ -42,13 +54,16 @@ void Application::Shutdown() {
   // Shutdown ImGui
   ShutdownImGui();
 
+  // Shutdown renderer
+  ShutdownRenderer();
+
   // Shutdown SDL
   ShutdownSdl();
 }
 
 bool Application::InitializeSdl() {
   // Initialize SDL
-  constexpr SDL_InitFlags init_flags{ SDL_INIT_VIDEO };
+  constexpr SDL_InitFlags init_flags{SDL_INIT_VIDEO};
   if (!SDL_Init(init_flags)) {
     std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
     return false;
@@ -56,11 +71,22 @@ bool Application::InitializeSdl() {
 
   // Create window
   constexpr SDL_WindowFlags window_flags{
-    SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_VULKAN
-  };
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_VULKAN};
   window_ = SDL_CreateWindow("vkRT", 1280, 720, window_flags);
   if (!window_) {
     std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool Application::InitializeRenderer() {
+  renderer_ = renderer::Factory::CreateRenderer(renderer::Api::Vulkan);
+  if (!renderer_) {
+    std::cerr << "Failed to create "
+              << renderer::ApiToString(renderer::Api::Vulkan)
+              << " renderer." << std::endl;
     return false;
   }
 
@@ -94,8 +120,10 @@ void Application::ShutdownSdl() {
   SDL_Quit();
 }
 
-void Application::ShutdownImGui() {
+void Application::ShutdownRenderer() {
+}
 
+void Application::ShutdownImGui() {
 }
 
 void Application::HandleEvents() {
@@ -124,7 +152,6 @@ void Application::HandleEvents() {
 }
 
 void Application::UpdatePhysics() {
-
 }
 
 void Application::RenderViewport() {
@@ -133,4 +160,6 @@ void Application::RenderViewport() {
   // ???
   // ImGui::Render();
   // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData, ???);
+}
+
 }
