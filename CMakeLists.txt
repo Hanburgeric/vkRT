@@ -63,11 +63,15 @@ add_executable(
 
     src/Platform/Platform.h
     src/Platform/PlatformTypes.h
+    src/Platform/PlatformFactory.cpp
+    src/Platform/PlatformFactory.h
     src/Platform/PlatformUtils.cpp
     src/Platform/PlatformUtils.h
 
     src/Renderer/Renderer.h
     src/Renderer/RendererTypes.h
+    src/Renderer/RendererFactory.cpp
+    src/Renderer/RendererFactory.h
     src/Renderer/RendererUtils.cpp
     src/Renderer/RendererUtils.h
 )
