@@ -65,6 +65,10 @@ add_executable(
     src/Platform/PlatformTypes.h
     src/Platform/PlatformFactory.cpp
     src/Platform/PlatformFactory.h
+    src/Platform/Sdl3Platform.cpp
+    src/Platform/Sdl3Platform.h
+    src/Platform/GlfwPlatform.cpp
+    src/Platform/GlfwPlatform.h
     src/Platform/PlatformUtils.cpp
     src/Platform/PlatformUtils.h
 
@@ -72,6 +76,10 @@ add_executable(
     src/Renderer/RendererTypes.h
     src/Renderer/RendererFactory.cpp
     src/Renderer/RendererFactory.h
+    src/Renderer/VulkanRenderer.cpp
+    src/Renderer/VulkanRenderer.h
+    src/Renderer/OpenGlRenderer.cpp
+    src/Renderer/OpenGlRenderer.h
     src/Renderer/RendererUtils.cpp
     src/Renderer/RendererUtils.h
 )

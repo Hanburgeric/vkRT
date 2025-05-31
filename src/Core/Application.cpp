@@ -5,11 +5,11 @@
 #include <memory>
 
 // src
-#include "../Platform/Platform.h"
 #include "../Platform/PlatformTypes.h"
+#include "../Platform/PlatformFactory.h"
 #include "../Platform/PlatformUtils.h"
-#include "../Renderer/Renderer.h"
 #include "../Renderer/RendererTypes.h"
+#include "../Renderer/RendererFactory.h"
 #include "../Renderer/RendererUtils.h"
 
 namespace vkrt {
@@ -51,7 +51,7 @@ void Application::Shutdown() {
 }
 
 bool Application::InitializePlatform() {
-  //platform_ = platform::Factory::CreatePlatform(platform_type_);
+  platform_ = platform::Factory::Create(platform_type_);
 
   if (!platform_) {
     std::cerr << "Failed to create "
@@ -65,7 +65,7 @@ bool Application::InitializePlatform() {
 }
 
 bool Application::InitializeRenderer() {
-  //renderer_ = renderer::Factory::CreateRenderer(renderer_type_);
+  renderer_ = renderer::Factory::Create(renderer_type_);
 
   if (!renderer_) {
     std::cerr << "Failed to create "
