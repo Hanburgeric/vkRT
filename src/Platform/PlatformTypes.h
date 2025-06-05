@@ -9,7 +9,7 @@ enum class Type {
   GLFW
 };
 
-}  // namespace platform
-}  // namespace vkrt
+} // namespace platform
+} // namespace vkrt
 
 #endif // PLATFORMTYPES_H

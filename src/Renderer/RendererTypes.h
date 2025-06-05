@@ -9,7 +9,7 @@ enum class Type {
   OpenGL
 };
 
-}  // namespace renderer
-}  // namespace vkrt
+} // namespace renderer
+} // namespace vkrt
 
 #endif // RENDERERTYPES_H

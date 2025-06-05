@@ -1,17 +1,23 @@
 #include "RendererUtils.h"
 
+// STL
+#include <string>
+
+// src
+#include "RendererTypes.h"
+
 namespace vkrt {
 namespace renderer {
 namespace utils {
 
-std::string ToString(Type type) {
+std::string TypeToString(Type type) {
   switch (type) {
-    case Type::Vulkan: { return "Vulkan"; }
-    case Type::OpenGL: { return "OpenGL"; }
-    default: { return "unknown"; }
+    case Type::Vulkan: return "Vulkan";
+    case Type::OpenGL: return "OpenGL";
+    default: return "Unknown";
   }
 }
 
-}  // namespace utils
-}  // namespace renderer
-}  // namespace vkrt
+} // namespace utils
+} // namespace renderer
+} // namespace vkrt

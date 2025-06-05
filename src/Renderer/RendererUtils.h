@@ -11,10 +11,10 @@ namespace vkrt {
 namespace renderer {
 namespace utils {
 
-std::string ToString(Type type);
+std::string TypeToString(Type type);
 
-}  // namespace utils
-}  // namespace renderer
-}  // namespace vkrt
+} // namespace utils
+} // namespace renderer
+} // namespace vkrt
 
 #endif // RENDERERUTILS_H

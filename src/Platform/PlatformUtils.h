@@ -11,10 +11,10 @@ namespace vkrt {
 namespace platform {
 namespace utils {
 
-std::string ToString(Type type);
+std::string TypeToString(Type type);
 
-}  // namespace utils
-}  // namespace platform
-}  // namespace vkrt
+} // namespace utils
+} // namespace platform
+} // namespace vkrt
 
 #endif // PLATFORMUTILS_H
