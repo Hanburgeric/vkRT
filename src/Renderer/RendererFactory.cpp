@@ -1,7 +1,10 @@
 #include "RendererFactory.h"
 
-namespace vkrt {
-namespace renderer {
+// src
+#include "VulkanRenderer.h"
+#include "OpenGlRenderer.h"
+
+namespace vkrt::renderer {
 
 std::unique_ptr<Renderer> Factory::Create(Type type) {
   switch (type) {
@@ -12,12 +15,11 @@ std::unique_ptr<Renderer> Factory::Create(Type type) {
 }
 
 std::unique_ptr<Renderer> Factory::CreateVulkan() {
-  return nullptr;
+  return std::make_unique<VulkanRenderer>();
 }
 
 std::unique_ptr<Renderer> Factory::CreateOpenGl() {
-  return nullptr;
+  return std::make_unique<OpenGlRenderer>();
 }
 
-}  // namespace renderer
-}  // namespace vkrt
+}  // namespace vkrt::renderer

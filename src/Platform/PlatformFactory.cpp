@@ -1,7 +1,10 @@
 #include "PlatformFactory.h"
 
-namespace vkrt {
-namespace platform {
+// src
+#include "Sdl3Platform.h"
+#include "GlfwPlatform.h"
+
+namespace vkrt::platform {
 
 std::unique_ptr<Platform> Factory::Create(Type type) {
   switch (type) {
@@ -12,12 +15,11 @@ std::unique_ptr<Platform> Factory::Create(Type type) {
 }
 
 std::unique_ptr<Platform> Factory::CreateSdl3() {
-  return nullptr;
+  return std::make_unique<Sdl3Platform>();
 }
 
 std::unique_ptr<Platform> Factory::CreateGlfw() {
-  return nullptr;
+  return std::make_unique<GlfwPlatform>();
 }
 
-}  // namespace platform
-}  // namespace vkrt
+}  // namespace vkrt::platform

@@ -112,7 +112,9 @@ target_sources(
 
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
+    ${Vulkan_INCLUDE_DIRS}
     ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
 )
 
 target_link_libraries(
