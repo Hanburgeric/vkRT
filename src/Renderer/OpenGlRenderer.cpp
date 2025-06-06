@@ -14,6 +14,14 @@ Type OpenGlRenderer::type() const {
   return Type::OpenGL;
 }
 
+bool OpenGlRenderer::Initialize() {
+  return true;
+}
+
+void OpenGlRenderer::Shutdown() {
+
+}
+
 bool OpenGlRenderer::InitializeImGui() const {
   return ImGui_ImplOpenGL3_Init();
 }

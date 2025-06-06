@@ -44,11 +44,18 @@ FetchContent_Declare(
     GIT_TAG         8d604353a53853fa56d1bdce0363535605ca868f
 )
 
+FetchContent_Declare(
+    spdlog          # v1.15.3
+    GIT_REPOSITORY  https://github.com/gabime/spdlog.git
+    GIT_TAG         6fa36017cfd5731d617e1a934f0e5ea9c4445b13
+)
+
 FetchContent_MakeAvailable(
     glfw
     glm
     imgui
     SDL3
+    spdlog
 )
 
 # ======================================================================
@@ -119,6 +126,7 @@ target_link_libraries(
     glm::glm
     OpenGL::GL
     SDL3::SDL3
+    spdlog::spdlog
     Vulkan::Vulkan
 )
 

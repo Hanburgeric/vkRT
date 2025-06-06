@@ -16,6 +16,9 @@ public:
 
   virtual Type type() const = 0;
 
+  virtual bool Initialize() = 0;
+  virtual void Shutdown() = 0;
+
   virtual bool InitializeImGui() const = 0;
   virtual void BeginNewImGuiFrame() const = 0;
   virtual void RenderImGuiDrawData(ImDrawData* draw_data) const = 0;

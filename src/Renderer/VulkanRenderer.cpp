@@ -14,6 +14,14 @@ Type VulkanRenderer::type() const {
   return Type::Vulkan;
 }
 
+bool VulkanRenderer::Initialize() {
+  return true;
+}
+
+void VulkanRenderer::Shutdown() {
+
+}
+
 bool VulkanRenderer::InitializeImGui() const {
   // ???
   return true;

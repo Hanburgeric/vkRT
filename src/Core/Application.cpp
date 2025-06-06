@@ -46,7 +46,7 @@ bool Application::Initialize() {
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
   // Initialize ImGui for platform
-  if (!platform_->InitializeImGui()) {
+  if (!platform_->InitializeImGui(renderer_->type())) {
     std::cerr << platform::utils::TypeToString(platform_->type())
               << " platform failed to initialize ImGui." << std::endl;
     return false;
@@ -65,25 +65,25 @@ bool Application::Initialize() {
 void Application::Run() {
   while (!platform_->ShouldQuit()) {
     // Handle events
-    platform_->PollEvents();
-    platform_->ProcessImGuiEvents();
-    // process events here
+    platform_->HandleEvents();
 
     // Begin new ImGui frame
     renderer_->BeginNewImGuiFrame();
     platform_->BeginNewImGuiFrame();
     ImGui::NewFrame();
 
-    // replace with actual windows used by the application
+    // Replace with actual ImGui windows
+    // to be used by the application
     ImGui::ShowDemoWindow();
 
-    // implement update functions
+    // Update
+    // ???
 
     // Render
-    // clear framebuffer, render other stuff here
+    // Clear framebuffer, render other objects, etc.
     ImGui::Render();
     renderer_->RenderImGuiDrawData(ImGui::GetDrawData());
-    // swap backbuffers, etc. here
+    // Swap framebuffers, etc.
   }
 }
 
@@ -96,11 +96,13 @@ void Application::Shutdown() {
 
   // Shutdown and reset platform
   platform_->Shutdown();
-  platform_.reset();
+  delete platform_;
+  platform_ = nullptr;
 
   // Shutdown and reset renderer
   renderer_->Shutdown();
-  renderer_.reset();
+  delete renderer_;
+  renderer_ = nullptr;
 }
 
 } // namespace vkrt

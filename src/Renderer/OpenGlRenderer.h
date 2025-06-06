@@ -15,6 +15,9 @@ class OpenGlRenderer : public Renderer {
 public:
   Type type() const override;
 
+  bool Initialize() override;
+  void Shutdown() override;
+
   bool InitializeImGui() const override;
   void BeginNewImGuiFrame() const override;
   void RenderImGuiDrawData(ImDrawData* draw_data) const override;

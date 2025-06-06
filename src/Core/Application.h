@@ -1,9 +1,6 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-// STL
-#include <memory>
-
 // Forward declarations
 namespace vkrt::renderer{ class Renderer; }
 namespace vkrt::platform{ class Platform; }
@@ -20,8 +17,8 @@ public:
   void Shutdown();
 
 private:
-  std::unique_ptr<renderer::Renderer> renderer_;
-  std::unique_ptr<platform::Platform> platform_;
+  renderer::Renderer* renderer_;
+  platform::Platform* platform_;
   ImGuiContext* imgui_context_;
 };
 
