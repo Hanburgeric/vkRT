@@ -6,12 +6,11 @@
 #include <string>
 
 // src
+#include "../Renderer/Renderer.h"
 #include "../Renderer/RendererTypes.h"
-#include "../Platform/PlatformTypes.h"
 
-// Forward declarations
-namespace vkrt::renderer { class Renderer; }
-namespace vkrt::platform { class Platform; }
+#include "../Platform/Platform.h"
+#include "../Platform/PlatformTypes.h"
 
 namespace vkrt {
 

@@ -5,6 +5,7 @@
 #include <memory>
 
 // src
+#include "Platform.h"
 #include "PlatformTypes.h"
 
 // Forward declarations

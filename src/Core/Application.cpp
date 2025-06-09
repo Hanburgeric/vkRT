@@ -48,12 +48,14 @@ bool Application::Initialize(renderer::Type renderer_type,
     // Log or throw
     return false;
   }
+
+  return true;
 }
 
 void Application::Run() {
-  while (!platform_->ShouldQuit()) {
-    platform_->HandleEvents();
-  }
+  // while (!platform_->ShouldQuit()) {
+  //   platform_->HandleEvents();
+  // }
 }
 
 void Application::Shutdown() {

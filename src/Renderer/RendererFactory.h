@@ -5,10 +5,8 @@
 #include <memory>
 
 // src
+#include "Renderer.h"
 #include "RendererTypes.h"
-
-// Forward declarations
-namespace vkrt::renderer { class Renderer; }
 
 namespace vkrt {
 namespace renderer {

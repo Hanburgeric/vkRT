@@ -64,16 +64,27 @@ FetchContent_MakeAvailable(
 add_executable(
     ${PROJECT_NAME}
         src/main.cpp
+
         src/Core/Application.cpp
         src/Core/Application.h
+
         src/Renderer/Renderer.h
-        src/Platform/Platform.h
-        src/Platform/PlatformTypes.h
         src/Renderer/RendererTypes.h
-        src/Platform/PlatformFactory.cpp
-        src/Platform/PlatformFactory.h
+        src/Renderer/VulkanRenderer.cpp
+        src/Renderer/VulkanRenderer.h
+        src/Renderer/OpenGlRenderer.cpp
+        src/Renderer/OpenGlRenderer.h
         src/Renderer/RendererFactory.cpp
         src/Renderer/RendererFactory.h
+
+        src/Platform/Platform.h
+        src/Platform/PlatformTypes.h
+        src/Platform/Sdl3Platform.cpp
+        src/Platform/Sdl3Platform.h
+        src/Platform/GlfwPlatform.cpp
+        src/Platform/GlfwPlatform.h
+        src/Platform/PlatformFactory.cpp
+        src/Platform/PlatformFactory.h
 )
 
 target_sources(

@@ -21,11 +21,11 @@ std::unique_ptr<Platform> Factory::CreatePlatform(Type type) {
 }
 
 std::unique_ptr<Platform> Factory::CreateSdl3Platform() {
-  return nullptr;
+  return std::make_unique<Sdl3Platform>();
 }
 
 std::unique_ptr<Platform> Factory::CreateGlfwPlatform() {
-  return nullptr;
+  return std::make_unique<GlfwPlatform>();
 }
 
 } // namespace platform
