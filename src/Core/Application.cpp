@@ -43,8 +43,8 @@ bool Application::Initialize(renderer::Type renderer_type,
     return false;
   }
 
-  // Initialize platform
-  if (!platform_->Initialize()) {
+  // Initialize platform using the renderer
+  if (!platform_->Initialize(renderer_)) {
     // Log or throw
     return false;
   }

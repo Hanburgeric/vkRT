@@ -12,8 +12,8 @@
 namespace vkrt {
 namespace platform {
 
-std::unique_ptr<Platform> Factory::CreatePlatform(Type type) {
-  switch (type) {
+std::unique_ptr<Platform> Factory::CreatePlatform(Type platform_type) {
+  switch (platform_type) {
     case Type::SDL3: { return CreateSdl3Platform(); }
     case Type::GLFW: { return CreateGlfwPlatform(); }
     default: { return nullptr; }

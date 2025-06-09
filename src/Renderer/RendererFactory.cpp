@@ -12,8 +12,8 @@
 namespace vkrt {
 namespace renderer {
 
-std::unique_ptr<Renderer> Factory::CreateRenderer(Type type) {
-  switch (type) {
+std::unique_ptr<Renderer> Factory::CreateRenderer(Type renderer_type) {
+  switch (renderer_type) {
     case Type::Vulkan: { return CreateVulkanRenderer(); }
     case Type::OpenGL: { return CreateOpenGlRenderer(); }
     default: { return nullptr; }

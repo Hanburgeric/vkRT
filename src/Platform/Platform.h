@@ -1,6 +1,11 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+// src
+#include "PlatformTypes.h"
+
+#include "../Renderer/Renderer.h"
+
 namespace vkrt {
 namespace platform {
 
@@ -8,7 +13,9 @@ class Platform {
 public:
   virtual ~Platform() = default;
 
-  virtual bool Initialize() = 0;
+  virtual constexpr Type type() const = 0;
+
+  virtual bool Initialize(const renderer::Renderer& renderer) = 0;
   virtual void Shutdown() = 0;
 };
 

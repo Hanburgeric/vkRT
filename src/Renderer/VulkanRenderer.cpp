@@ -2,6 +2,7 @@
 
 // src
 #include "Renderer.h"
+#include "RendererTypes.h"
 
 namespace vkrt {
 namespace renderer {

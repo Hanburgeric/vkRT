@@ -13,7 +13,7 @@ namespace renderer {
 
 class Factory {
 public:
-  static std::unique_ptr<Renderer> CreateRenderer(Type type);
+  static std::unique_ptr<Renderer> CreateRenderer(Type renderer_type);
 
 private:
   static std::unique_ptr<Renderer> CreateVulkanRenderer();

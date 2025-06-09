@@ -16,7 +16,7 @@ namespace platform {
 
 class Factory {
 public:
-  static std::unique_ptr<Platform> CreatePlatform(Type type);
+  static std::unique_ptr<Platform> CreatePlatform(Type platform_type);
 
 private:
   static std::unique_ptr<Platform> CreateSdl3Platform();

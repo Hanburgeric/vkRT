@@ -3,12 +3,15 @@
 
 // src
 #include "Renderer.h"
+#include "RendererTypes.h"
 
 namespace vkrt {
 namespace renderer {
 
 class OpenGlRenderer : public Renderer {
 public:
+  constexpr Type type() const override { return Type::OpenGL; }
+
   bool Initialize() override;
   void Shutdown() override;
 };
