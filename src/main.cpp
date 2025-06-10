@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
   vkrt::Application application{};
   if (!application.Initialize(renderer_type, platform_type,
                               window_title, window_width, window_height)) {
-    spdlog::critical("Failed to initialize application.");
+    spdlog::error("Failed to initialize application.");
     application.Shutdown();
     return 1;
   }

@@ -2,7 +2,11 @@
 #define GLFWPLATFORM_H
 
 // STL
+#include <memory>
 #include <string>
+
+// GLFW
+#include "GLFW/glfw3.h"
 
 // src
 #include "Platform.h"
@@ -31,6 +35,12 @@ private:
   bool InitializeForOpenGl(const renderer::Renderer& renderer,
                            const std::string& window_title,
                            int window_width, int window_height);
+
+private:
+  bool initialized_{ false };
+  std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> window_{
+    nullptr, glfwDestroyWindow
+  };
 };
 
 } // namespace platform

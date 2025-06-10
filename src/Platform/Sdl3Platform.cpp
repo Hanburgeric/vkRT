@@ -1,6 +1,7 @@
 #include "Sdl3Platform.h"
 
 // STL
+#include <memory>
 #include <string>
 
 // spdlog
@@ -55,7 +56,7 @@ void Sdl3Platform::HandleEvents() {
 void Sdl3Platform::Shutdown() {
   // Destroy window
   if (window_) {
-    SDL_DestroyWindow(window_);
+    window_.reset();
   }
 
   // Shutdown
@@ -87,9 +88,12 @@ bool Sdl3Platform::InitializeForOpenGl(const renderer::Renderer& renderer,
   constexpr SDL_WindowFlags window_flags{
     SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY
   };
-  window_ = SDL_CreateWindow(window_title.c_str(),
-                             window_width, window_height,
-                             window_flags);
+  window_ = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(
+    SDL_CreateWindow(window_title.c_str(),
+                     window_width, window_height,
+                     window_flags),
+    SDL_DestroyWindow
+  );
   if (!window_) {
     spdlog::error("Failed to create SDL window: {0}", SDL_GetError());
     return false;

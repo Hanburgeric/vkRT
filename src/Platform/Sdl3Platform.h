@@ -2,6 +2,7 @@
 #define SDL3PLATFORM_H
 
 // STL
+#include <memory>
 #include <string>
 
 // SDL3
@@ -36,9 +37,11 @@ private:
                            int window_width, int window_height);
 
 private:
-  bool initialized_;
-  SDL_Window* window_;
-  bool should_quit_;
+  bool initialized_{ false };
+  std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_{
+    nullptr, SDL_DestroyWindow
+  };
+  bool should_quit_{ false };
 };
 
 } // namespace platform

@@ -1,6 +1,7 @@
 #include "GlfwPlatform.h"
 
 // STL
+#include <memory>
 #include <string>
 
 // spdlog
@@ -39,13 +40,23 @@ bool GlfwPlatform::Initialize(const renderer::Renderer& renderer,
   }
 }
 bool GlfwPlatform::ShouldQuit() const {
-  return true;
+  return glfwWindowShouldClose(window_.get());
 }
 
 void GlfwPlatform::HandleEvents() {
+  glfwPollEvents();
 }
 
 void GlfwPlatform::Shutdown() {
+  // Destroy window
+  if (window_) {
+    window_.reset();
+  }
+
+  // Shutdown
+  if (initialized_) {
+    glfwTerminate();
+  }
 }
 
 bool GlfwPlatform::InitializeForVulkan(const renderer::Renderer& renderer,
@@ -57,6 +68,24 @@ bool GlfwPlatform::InitializeForVulkan(const renderer::Renderer& renderer,
 bool GlfwPlatform::InitializeForOpenGl(const renderer::Renderer& renderer,
                                        const std::string& window_title,
                                        int window_width, int window_height) {
+  // Initialize GLFW
+  initialized_ = glfwInit();
+  if (!initialized_) {
+    spdlog::error("Failed to initialize GLFW.");
+    return false;
+  }
+
+  // Create window
+  window_ = std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)>(
+    glfwCreateWindow(window_width, window_height, window_title.c_str(),
+                     nullptr, nullptr),
+    glfwDestroyWindow
+  );
+  if (!window_) {
+    spdlog::error("Failed to create GLFW window");
+    return false;
+  }
+
   return true;
 }
 
