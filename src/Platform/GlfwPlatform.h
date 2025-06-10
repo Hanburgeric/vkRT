@@ -19,6 +19,15 @@ namespace platform {
 
 class GlfwPlatform : public Platform {
 public:
+  GlfwPlatform() = default;
+  ~GlfwPlatform() override;
+
+  GlfwPlatform(const GlfwPlatform&) = delete;
+  GlfwPlatform& operator=(const GlfwPlatform&) = delete;
+
+  GlfwPlatform(GlfwPlatform&&) = default;
+  GlfwPlatform& operator=(GlfwPlatform&&) = default;
+
   constexpr Type type() const override { return Type::GLFW; }
 
   bool Initialize(const renderer::Renderer& renderer,

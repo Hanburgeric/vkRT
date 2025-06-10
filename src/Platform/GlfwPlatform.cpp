@@ -22,6 +22,10 @@
 namespace vkrt {
 namespace platform {
 
+GlfwPlatform::~GlfwPlatform() {
+  GlfwPlatform::Shutdown();
+}
+
 bool GlfwPlatform::Initialize(const renderer::Renderer& renderer,
                               const std::string& window_title, int window_width,
                               int window_height) {
@@ -39,6 +43,7 @@ bool GlfwPlatform::Initialize(const renderer::Renderer& renderer,
     }
   }
 }
+
 bool GlfwPlatform::ShouldQuit() const {
   return glfwWindowShouldClose(window_.get());
 }

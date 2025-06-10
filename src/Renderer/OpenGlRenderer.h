@@ -10,6 +10,15 @@ namespace renderer {
 
 class OpenGlRenderer : public Renderer {
 public:
+  OpenGlRenderer() = default;
+  ~OpenGlRenderer() override;
+
+  OpenGlRenderer(const OpenGlRenderer&) = delete;
+  OpenGlRenderer& operator=(const OpenGlRenderer&) = delete;
+
+  OpenGlRenderer(OpenGlRenderer&&) = default;
+  OpenGlRenderer& operator=(OpenGlRenderer&&) = default;
+
   constexpr Type type() const override { return Type::OpenGL; }
 
   bool Initialize() override;

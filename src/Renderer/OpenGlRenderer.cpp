@@ -7,6 +7,10 @@
 namespace vkrt {
 namespace renderer {
 
+OpenGlRenderer::~OpenGlRenderer() {
+  OpenGlRenderer::Shutdown();
+}
+
 bool OpenGlRenderer::Initialize() {
   return true;
 }

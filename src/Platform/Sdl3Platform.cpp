@@ -22,6 +22,10 @@
 namespace vkrt {
 namespace platform {
 
+Sdl3Platform::~Sdl3Platform() {
+  Sdl3Platform::Shutdown();
+}
+
 bool Sdl3Platform::Initialize(const renderer::Renderer& renderer,
                               const std::string& window_title, int window_width,
                               int window_height) {
@@ -39,6 +43,7 @@ bool Sdl3Platform::Initialize(const renderer::Renderer& renderer,
     }
   }
 }
+
 bool Sdl3Platform::ShouldQuit() const {
   return should_quit_;
 }

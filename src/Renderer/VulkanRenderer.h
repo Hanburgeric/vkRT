@@ -10,6 +10,15 @@ namespace renderer {
 
 class VulkanRenderer : public Renderer {
 public:
+  VulkanRenderer() = default;
+  ~VulkanRenderer() override;
+
+  VulkanRenderer(const VulkanRenderer&) = delete;
+  VulkanRenderer& operator=(const VulkanRenderer&) = delete;
+
+  VulkanRenderer(VulkanRenderer&&) = default;
+  VulkanRenderer& operator=(VulkanRenderer&&) = default;
+
   constexpr Type type() const override { return Type::Vulkan; }
 
   bool Initialize() override;

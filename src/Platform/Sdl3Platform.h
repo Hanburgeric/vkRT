@@ -19,6 +19,15 @@ namespace platform {
 
 class Sdl3Platform : public Platform {
 public:
+  Sdl3Platform() = default;
+  ~Sdl3Platform() override;
+
+  Sdl3Platform(const Sdl3Platform&) = delete;
+  Sdl3Platform& operator=(const Sdl3Platform&) = delete;
+
+  Sdl3Platform(Sdl3Platform&&) = default;
+  Sdl3Platform& operator=(Sdl3Platform&&) = default;
+
   constexpr Type type() const override { return Type::SDL3; }
 
   bool Initialize(const renderer::Renderer& renderer,

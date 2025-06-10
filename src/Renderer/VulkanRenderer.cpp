@@ -7,6 +7,10 @@
 namespace vkrt {
 namespace renderer {
 
+VulkanRenderer::~VulkanRenderer() {
+  VulkanRenderer::Shutdown();
+}
+
 bool VulkanRenderer::Initialize() {
   return false;
 }
