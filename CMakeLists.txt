@@ -76,6 +76,8 @@ add_executable(
         src/Renderer/OpenGlRenderer.h
         src/Renderer/RendererFactory.cpp
         src/Renderer/RendererFactory.h
+        src/Renderer/RendererUtils.cpp
+        src/Renderer/RendererUtils.h
 
         src/Platform/Platform.h
         src/Platform/PlatformTypes.h
@@ -85,6 +87,8 @@ add_executable(
         src/Platform/GlfwPlatform.h
         src/Platform/PlatformFactory.cpp
         src/Platform/PlatformFactory.h
+        src/Platform/PlatformUtils.cpp
+        src/Platform/PlatformUtils.h
 )
 
 target_sources(
