@@ -25,8 +25,8 @@ public:
   GlfwPlatform(const GlfwPlatform&) = delete;
   GlfwPlatform& operator=(const GlfwPlatform&) = delete;
 
-  GlfwPlatform(GlfwPlatform&&) = default;
-  GlfwPlatform& operator=(GlfwPlatform&&) = default;
+  GlfwPlatform(GlfwPlatform&&) = delete;
+  GlfwPlatform& operator=(GlfwPlatform&&) = delete;
 
   constexpr Type type() const override { return Type::GLFW; }
 

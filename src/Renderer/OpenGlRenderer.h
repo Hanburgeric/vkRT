@@ -16,8 +16,8 @@ public:
   OpenGlRenderer(const OpenGlRenderer&) = delete;
   OpenGlRenderer& operator=(const OpenGlRenderer&) = delete;
 
-  OpenGlRenderer(OpenGlRenderer&&) = default;
-  OpenGlRenderer& operator=(OpenGlRenderer&&) = default;
+  OpenGlRenderer(OpenGlRenderer&&) = delete;
+  OpenGlRenderer& operator=(OpenGlRenderer&&) = delete;
 
   constexpr Type type() const override { return Type::OpenGL; }
 

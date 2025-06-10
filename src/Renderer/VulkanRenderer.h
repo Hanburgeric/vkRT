@@ -16,8 +16,8 @@ public:
   VulkanRenderer(const VulkanRenderer&) = delete;
   VulkanRenderer& operator=(const VulkanRenderer&) = delete;
 
-  VulkanRenderer(VulkanRenderer&&) = default;
-  VulkanRenderer& operator=(VulkanRenderer&&) = default;
+  VulkanRenderer(VulkanRenderer&&) = delete;
+  VulkanRenderer& operator=(VulkanRenderer&&) = delete;
 
   constexpr Type type() const override { return Type::Vulkan; }
 

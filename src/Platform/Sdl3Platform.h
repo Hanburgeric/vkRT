@@ -25,8 +25,8 @@ public:
   Sdl3Platform(const Sdl3Platform&) = delete;
   Sdl3Platform& operator=(const Sdl3Platform&) = delete;
 
-  Sdl3Platform(Sdl3Platform&&) = default;
-  Sdl3Platform& operator=(Sdl3Platform&&) = default;
+  Sdl3Platform(Sdl3Platform&&) = delete;
+  Sdl3Platform& operator=(Sdl3Platform&&) = delete;
 
   constexpr Type type() const override { return Type::SDL3; }
 
