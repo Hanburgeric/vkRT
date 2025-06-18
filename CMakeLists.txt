@@ -16,14 +16,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
 # Dependencies
 # ======================================================================
 find_package(Vulkan REQUIRED)
-find_package(OpenGL REQUIRED)
 
 include(FetchContent)
 
 FetchContent_Declare(
-    glfw            # 3.4
-    GIT_REPOSITORY  https://github.com/glfw/glfw.git
-    GIT_TAG         7b6aead9fb88b3623e3b3725ebb42670cbe4c579
+    EnTT            # v3.15.0
+    GIT_REPOSITORY  https://github.com/skypjack/entt.git
+    GIT_TAG         d4014c74dc3793aba95ae354d6e23a026c2796db
 )
 
 FetchContent_Declare(
@@ -51,11 +50,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(
-    glfw
-    glm
-    imgui
-    SDL3
-    spdlog
+    EnTT glm imgui SDL3 spdlog
 )
 
 # ======================================================================
@@ -65,30 +60,8 @@ add_executable(
     ${PROJECT_NAME}
         src/main.cpp
 
-        src/Core/Application.cpp
-        src/Core/Application.h
-
-        src/Renderer/Renderer.h
-        src/Renderer/RendererTypes.h
-        src/Renderer/VulkanRenderer.cpp
-        src/Renderer/VulkanRenderer.h
-        src/Renderer/OpenGlRenderer.cpp
-        src/Renderer/OpenGlRenderer.h
-        src/Renderer/RendererFactory.cpp
-        src/Renderer/RendererFactory.h
-        src/Renderer/RendererUtils.cpp
-        src/Renderer/RendererUtils.h
-
-        src/Platform/Platform.h
-        src/Platform/PlatformTypes.h
-        src/Platform/Sdl3Platform.cpp
-        src/Platform/Sdl3Platform.h
-        src/Platform/GlfwPlatform.cpp
-        src/Platform/GlfwPlatform.h
-        src/Platform/PlatformFactory.cpp
-        src/Platform/PlatformFactory.h
-        src/Platform/PlatformUtils.cpp
-        src/Platform/PlatformUtils.h
+        src/Application.cpp
+        src/Application.h
 )
 
 target_sources(
@@ -105,11 +78,6 @@ target_sources(
         ${imgui_SOURCE_DIR}/imstb_textedit.h
         ${imgui_SOURCE_DIR}/imstb_truetype.h
 
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.h
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h
         ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.h
         ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
@@ -123,14 +91,14 @@ target_include_directories(
     ${PROJECT_NAME} PRIVATE
         ${imgui_SOURCE_DIR}
         ${imgui_SOURCE_DIR}/backends
+
         ${Vulkan_INCLUDE_DIRS}
 )
 
 target_link_libraries(
     ${PROJECT_NAME} PRIVATE
-        glfw
+        EnTT::EnTT
         glm::glm
-        OpenGL::GL
         SDL3::SDL3
         spdlog::spdlog
         Vulkan::Vulkan
