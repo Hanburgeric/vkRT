@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(vkRT)
+project(vkRT VERSION 0.1.0 LANGUAGES C CXX)
 
 # ======================================================================
 # Compiler Settings

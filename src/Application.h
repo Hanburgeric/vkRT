@@ -30,7 +30,8 @@ public:
 private:
   bool InitializePlatform();
   bool InitializeRenderer();
-  bool CreateRendererInstance();
+  bool CreateVulkanInstance();
+  bool EnableRendererValidation();
 
   void ShutdownRenderer();
   void ShutdownPlatform();

@@ -2,6 +2,8 @@
 
 // STL
 #include <memory>
+#include <string>
+#include <unordered_set>
 
 // spdlog
 #include "spdlog/spdlog.h"
@@ -21,10 +23,12 @@ Application::~Application() {
 
 bool Application::Initialize() {
   if (!InitializePlatform()) {
+    spdlog::error("Failed to initialize application platform.");
     return false;
   }
 
   if (!InitializeRenderer()) {
+    spdlog::error("Failed to initialize application renderer.");
     return false;
   }
 
@@ -56,17 +60,17 @@ void Application::Shutdown() {
 }
 
 bool Application::InitializePlatform() {
-  // Initialize platform
+  // Initialize SDL3
   constexpr SDL_InitFlags init_flags{
     SDL_INIT_VIDEO | SDL_INIT_GAMEPAD
   };
   platform_initialized_ = SDL_Init(init_flags);
   if (!platform_initialized_) {
     spdlog::error(SDL_GetError());
-    spdlog::error("Application failed to initialize platform.");
+    spdlog::error("Failed to initialize SDL3.");
     return false;
   } else {
-    spdlog::info("Application platform initialized.");
+    spdlog::info("SDL3 initialized.");
   }
 
   // Create window
@@ -81,27 +85,27 @@ bool Application::InitializePlatform() {
   };
   if (!window_) {
     spdlog::error(SDL_GetError());
-    spdlog::error("Application failed to create window.");
+    spdlog::error("Failed to create SDL3 window.");
     return false;
   } else {
-    spdlog::info("Application window created.");
+    spdlog::info("SDL3 window created.");
   }
 
   return true;
 }
 
 bool Application::InitializeRenderer() {
-  if (!CreateRendererInstance()) {
-    spdlog::error("Application failed to create renderer instance.");
+  if (!CreateVulkanInstance()) {
+    spdlog::error("Failed to create Vulkan instance.");
     return false;;
   } else {
-    spdlog::info("Application renderer instance created.");
+    spdlog::info("Vulkan instance created.");
   }
 
   return true;
 }
 
-bool Application::CreateRendererInstance() {
+bool Application::CreateVulkanInstance() {
   // Create application info
   VkApplicationInfo application_info{};
   application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -112,12 +116,68 @@ bool Application::CreateRendererInstance() {
   application_info.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
   application_info.apiVersion = VK_API_VERSION_1_4;
 
-  // Query extensions required by the platform needed to create instance info
-  uint32_t extension_count{};
-  char const* const* extension_names {
-    SDL_Vulkan_GetInstanceExtensions(&extension_count)
+  // Query extensions supported by this installation of Vulkan
+  uint32_t supported_extension_count{};
+  vkEnumerateInstanceExtensionProperties(
+    nullptr, &supported_extension_count, nullptr
+  );
+
+  std::vector<VkExtensionProperties> supported_extensions{
+    supported_extension_count
+  };
+  vkEnumerateInstanceExtensionProperties(
+    nullptr, &supported_extension_count, supported_extensions.data()
+  );
+
+  spdlog::info("Supported Vulkan instance extensions:");
+  for (const VkExtensionProperties& extension : supported_extensions) {
+    spdlog::info("  {}", extension.extensionName);
+  }
+
+  // Query extensions required by SDL3 needed to create instance info
+  uint32_t required_extension_count{};
+  char const* const* required_extension_names{
+      SDL_Vulkan_GetInstanceExtensions(&required_extension_count)
   };
 
+  std::vector<const char*> required_extensions{};
+  required_extensions.reserve(required_extension_count);
+  for (uint32_t i{ 0U }; i < required_extension_count; ++i) {
+    required_extensions.emplace_back(required_extension_names[i]);
+  }
+
+  // Add additional extensions required by the application
+  // ???
+
+  spdlog::info("Required Vulkan instance extensions:");
+  for (const char* extension : required_extensions) {
+    spdlog::info("  {}", extension);
+  }
+
+  // Check that all required extensions are supported,
+  // using an unordered set for constant lookup times
+  std::unordered_set<std::string> supported_extension_set{};
+  for (const VkExtensionProperties& extension : supported_extensions) {
+    supported_extension_set.emplace(extension.extensionName);
+  }
+
+  std::vector<std::string> missing_extensions{};
+  for (const char* extension : required_extensions) {
+    if (!supported_extension_set.contains(extension)) {
+      missing_extensions.emplace_back(extension);
+    }
+  }
+
+  if (!missing_extensions.empty()) {
+    spdlog::info("Missing Vulkan instance extensions:");
+    for (const std::string& extension : missing_extensions) {
+      spdlog::error("  {}", extension);
+    }
+
+    return false;
+  }
+
+  // Create instance info
   VkInstanceCreateInfo instance_create_info{};
   instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   // instance_create_info.pNext;
@@ -125,20 +185,28 @@ bool Application::CreateRendererInstance() {
   instance_create_info.pApplicationInfo = &application_info;
   // instance_create_info.enabledLayerCount;
   // instance_create_info.ppEnabledLayerNames;
-  instance_create_info.enabledExtensionCount = extension_count;
-  instance_create_info.ppEnabledExtensionNames = extension_names;
+  instance_create_info.enabledExtensionCount
+    = static_cast<uint32_t>(required_extensions.size());
+  instance_create_info.ppEnabledExtensionNames
+    = required_extensions.data();
 
   VkResult result{
-    vkCreateInstance(&instance_create_info, nullptr, &renderer_instance_)
+      vkCreateInstance(&instance_create_info, nullptr, &renderer_instance_)
   };
 
   return result == VK_SUCCESS;
 }
 
+bool Application::EnableRendererValidation() {
+  const std::vector<std::string> validation_layers{
+    "VK_LAYER_KHRONOS_validation"
+  };
+}
+
 void Application::ShutdownRenderer() {
   if (renderer_instance_) {
     vkDestroyInstance(renderer_instance_, nullptr);
-    spdlog::info("Application renderer instance destroyed.");
+    spdlog::info("Vulkan instance destroyed.");
   }
 }
 
@@ -146,14 +214,14 @@ void Application::ShutdownPlatform() {
   // Destroy window
   if (window_) {
     window_.reset();
-    spdlog::info("Application window destroyed.");
+    spdlog::info("SDL3 window destroyed.");
   }
 
   // Shutdown platform
   if (platform_initialized_) {
     SDL_Quit();
     platform_initialized_ = false;
-    spdlog::info("Application platform shut down.");
+    spdlog::info("SDL3 shut down.");
   }
 }
 
