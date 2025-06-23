@@ -8,7 +8,7 @@
 #include "SDL3/SDL.h"
 
 // vulkan
-#include "vulkan/vulkan.h"
+#include "vulkan/vulkan.hpp"
 
 namespace vkrt {
 
@@ -29,9 +29,9 @@ public:
 
 private:
   bool InitializePlatform();
+
   bool InitializeRenderer();
   bool CreateVulkanInstance();
-  bool EnableRendererValidation();
 
   void ShutdownRenderer();
   void ShutdownPlatform();
@@ -42,7 +42,7 @@ private:
                   decltype(&SDL_DestroyWindow)> window_{ nullptr, nullptr };
   bool should_quit_{ false };
 
-  VkInstance renderer_instance_{ nullptr };
+  vk::UniqueInstance vk_instance_{ nullptr };
 };
 
 } // namespace vkrt

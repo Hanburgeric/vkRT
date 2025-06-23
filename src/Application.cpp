@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 // spdlog
 #include "spdlog/spdlog.h"
@@ -13,7 +14,7 @@
 #include "SDL3/SDL_vulkan.h"
 
 // vulkan
-#include "vulkan/vulkan.h"
+#include "vulkan/vulkan.hpp"
 
 namespace vkrt {
 
@@ -107,31 +108,22 @@ bool Application::InitializeRenderer() {
 
 bool Application::CreateVulkanInstance() {
   // Create application info
-  VkApplicationInfo application_info{};
-  application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  // application_info.pNext;
-  application_info.pApplicationName = "vkRT Application";
-  application_info.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-  application_info.pEngineName = "vkRT";
-  application_info.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-  application_info.apiVersion = VK_API_VERSION_1_4;
+  constexpr vk::ApplicationInfo application_info{
+    "vkRT Application",
+    VK_MAKE_API_VERSION(0, 1, 0, 0),
+    "vkRT",
+    VK_MAKE_API_VERSION(0, 1, 0, 0),
+    VK_API_VERSION_1_3
+  };
 
   // Query extensions supported by this installation of Vulkan
-  uint32_t supported_extension_count{};
-  vkEnumerateInstanceExtensionProperties(
-    nullptr, &supported_extension_count, nullptr
-  );
-
-  std::vector<VkExtensionProperties> supported_extensions{
-    supported_extension_count
+  const std::vector<vk::ExtensionProperties> supported_extensions{
+    vk::enumerateInstanceExtensionProperties()
   };
-  vkEnumerateInstanceExtensionProperties(
-    nullptr, &supported_extension_count, supported_extensions.data()
-  );
 
   spdlog::info("Supported Vulkan instance extensions:");
-  for (const VkExtensionProperties& extension : supported_extensions) {
-    spdlog::info("  {}", extension.extensionName);
+  for (const vk::ExtensionProperties& extension : supported_extensions) {
+    spdlog::info("  {}", extension.extensionName.data());
   }
 
   // Query extensions required by SDL3 needed to create instance info
@@ -157,7 +149,7 @@ bool Application::CreateVulkanInstance() {
   // Check that all required extensions are supported,
   // using an unordered set for constant lookup times
   std::unordered_set<std::string> supported_extension_set{};
-  for (const VkExtensionProperties& extension : supported_extensions) {
+  for (const vk::ExtensionProperties& extension : supported_extensions) {
     supported_extension_set.emplace(extension.extensionName);
   }
 
@@ -173,39 +165,32 @@ bool Application::CreateVulkanInstance() {
     for (const std::string& extension : missing_extensions) {
       spdlog::error("  {}", extension);
     }
-
     return false;
   }
 
   // Create instance info
-  VkInstanceCreateInfo instance_create_info{};
-  instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  // instance_create_info.pNext;
-  // instance_create_info.flags;
-  instance_create_info.pApplicationInfo = &application_info;
-  // instance_create_info.enabledLayerCount;
-  // instance_create_info.ppEnabledLayerNames;
-  instance_create_info.enabledExtensionCount
-    = static_cast<uint32_t>(required_extensions.size());
-  instance_create_info.ppEnabledExtensionNames
-    = required_extensions.data();
-
-  VkResult result{
-      vkCreateInstance(&instance_create_info, nullptr, &renderer_instance_)
+  const vk::InstanceCreateInfo instance_create_info{
+    {},
+    { &application_info },
+    {},
+    {},
+    static_cast<uint32_t>(required_extensions.size()),
+    required_extensions.data()
   };
 
-  return result == VK_SUCCESS;
-}
-
-bool Application::EnableRendererValidation() {
-  const std::vector<std::string> validation_layers{
-    "VK_LAYER_KHRONOS_validation"
-  };
+  // Attempt to create instance and return result
+  try {
+    vk_instance_ = vk::createInstanceUnique(instance_create_info);
+    return true;
+  } catch (const vk::SystemError& e) {
+    spdlog::error(e.what());
+    return false;
+  }
 }
 
 void Application::ShutdownRenderer() {
-  if (renderer_instance_) {
-    vkDestroyInstance(renderer_instance_, nullptr);
+  if (vk_instance_) {
+    vk_instance_.reset();
     spdlog::info("Vulkan instance destroyed.");
   }
 }
