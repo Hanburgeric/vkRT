@@ -117,64 +117,121 @@ bool Application::CreateVulkanInstance() {
     .apiVersion{ VK_MAKE_API_VERSION(0, 1, 3, 0) }
   };
 
-  // Query extensions supported by this installation of Vulkan
-  const std::vector<vk::ExtensionProperties> supported_extensions{
-    vk::enumerateInstanceExtensionProperties()
-  };
+  // Add layers required by the application
+  std::vector<const char*> required_layers{};
+#ifndef NDEBUG
+  required_layers.emplace_back(
+    "VK_LAYER_KHRONOS_validation"
+  );
+#endif
 
-  spdlog::info("Supported Vulkan instance extensions:");
-  for (const vk::ExtensionProperties& extension : supported_extensions) {
-    spdlog::info("  {}", extension.extensionName.data());
+  // If any layers are required, check whether they are available
+  if (!required_layers.empty()) {
+    spdlog::info("Required Vulkan instance layers:");
+    for (const char* layer : required_layers) {
+      spdlog::info("  {}", layer);
+    }
+
+    // Query layers supported by this installation of Vulkan
+    const std::vector<vk::LayerProperties> supported_layers{
+      vk::enumerateInstanceLayerProperties()
+    };
+
+    spdlog::info("Supported Vulkan instance layers:");
+    for (const vk::LayerProperties& layer : supported_layers) {
+      spdlog::info("  {}", layer.layerName.data());
+    }
+
+    // Check for any missing layers,
+    // using an unordered set for constant lookup times
+    std::unordered_set<std::string> supported_layer_set{};
+    supported_layer_set.reserve(supported_layers.size());
+    for (const vk::LayerProperties& layer : supported_layers) {
+      supported_layer_set.emplace(layer.layerName.data());
+    }
+
+    std::vector<std::string> missing_layers{};
+    for (const char* layer : required_layers) {
+      if (!supported_layer_set.contains(layer)) {
+        missing_layers.emplace_back(layer);
+      }
+    }
+
+    // Report any missing layers and return failure
+    if (!missing_layers.empty()) {
+      spdlog::info("Missing Vulkan instance layers:");
+      for (const std::string& layer : missing_layers) {
+        spdlog::info("  {}", layer);
+      }
+      return false;
+    }
   }
 
-  // Query extensions required by SDL3 needed to create instance info
+  // Add extensions required by the application
+  std::vector<const char*> required_extensions{};
+
+  // Query extensions required by SDL3
   uint32_t required_extension_count{};
   char const* const* required_extension_names{
-      SDL_Vulkan_GetInstanceExtensions(&required_extension_count)
+    SDL_Vulkan_GetInstanceExtensions(&required_extension_count)
   };
 
-  std::vector<const char*> required_extensions{};
-  required_extensions.reserve(required_extension_count);
+  // Add extensions required by SDL3
+  required_extensions.reserve(
+    required_extensions.size() + required_extension_count
+  );
   for (uint32_t i{ 0U }; i < required_extension_count; ++i) {
     required_extensions.emplace_back(required_extension_names[i]);
   }
 
-  // Add additional extensions required by the application
-  // ???
-
-  spdlog::info("Required Vulkan instance extensions:");
-  for (const char* extension : required_extensions) {
-    spdlog::info("  {}", extension);
-  }
-
-  // Check that all required extensions are supported,
-  // using an unordered set for constant lookup times
-  std::unordered_set<std::string> supported_extension_set{};
-  for (const vk::ExtensionProperties& extension : supported_extensions) {
-    supported_extension_set.emplace(extension.extensionName);
-  }
-
-  std::vector<std::string> missing_extensions{};
-  for (const char* extension : required_extensions) {
-    if (!supported_extension_set.contains(extension)) {
-      missing_extensions.emplace_back(extension);
+  // If any extensions are required, check whether they are available
+  if (!required_extensions.empty()) {
+    spdlog::info("Required Vulkan instance extensions:");
+    for (const char* extension : required_extensions) {
+      spdlog::info("  {}", extension);
     }
-  }
 
-  if (!missing_extensions.empty()) {
-    spdlog::info("Missing Vulkan instance extensions:");
-    for (const std::string& extension : missing_extensions) {
-      spdlog::error("  {}", extension);
+    // Query extensions supported by this installation of Vulkan
+    const std::vector<vk::ExtensionProperties> supported_extensions{
+      vk::enumerateInstanceExtensionProperties()
+    };
+
+    spdlog::info("Supported Vulkan instance extensions:");
+    for (const vk::ExtensionProperties& extension : supported_extensions) {
+      spdlog::info("  {}", extension.extensionName.data());
     }
-    return false;
+
+    // Check for any missing extensions,
+    // using an unordered set for constant lookup times
+    std::unordered_set<std::string> supported_extension_set{};
+    supported_extension_set.reserve(supported_extensions.size());
+    for (const vk::ExtensionProperties& extension : supported_extensions) {
+      supported_extension_set.emplace(extension.extensionName.data());
+    }
+
+    std::vector<std::string> missing_extensions{};
+    for (const char* extension : required_extensions) {
+      if (!supported_extension_set.contains(extension)) {
+        missing_extensions.emplace_back(extension);
+      }
+    }
+
+    // Report any missing extensions and return failure
+    if (!missing_extensions.empty()) {
+      spdlog::info("Missing Vulkan instance extensions:");
+      for (const std::string& extension : missing_extensions) {
+        spdlog::info("  {}", extension);
+      }
+      return false;
+    }
   }
 
   // Create instance info
   const vk::InstanceCreateInfo instance_create_info{
     .pNext{},
     .pApplicationInfo{ &application_info },
-    .enabledLayerCount{},
-    .ppEnabledLayerNames{},
+    .enabledLayerCount{ static_cast<uint32_t>(required_layers.size()) },
+    .ppEnabledLayerNames{ required_layers.data() },
     .enabledExtensionCount{ static_cast<uint32_t>(required_extensions.size()) },
     .ppEnabledExtensionNames{ required_extensions.data() }
   };

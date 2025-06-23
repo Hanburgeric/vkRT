@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
   vkrt::Application application{};
   if (!application.Initialize()) {
-    spdlog::error("Failed to initialize vkrt application.");
+    spdlog::error("Failed to initialize vkRT application.");
     return 1;
   }
 
