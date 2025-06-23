@@ -104,6 +104,11 @@ target_link_libraries(
         Vulkan::Vulkan
 )
 
+target_compile_definitions(
+    ${PROJECT_NAME} PRIVATE
+        VULKAN_HPP_NO_CONSTRUCTORS
+)
+
 # ======================================================================
 # Post Build Commands
 # ======================================================================

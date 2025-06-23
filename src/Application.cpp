@@ -109,11 +109,12 @@ bool Application::InitializeRenderer() {
 bool Application::CreateVulkanInstance() {
   // Create application info
   constexpr vk::ApplicationInfo application_info{
-    "vkRT Application",
-    VK_MAKE_API_VERSION(0, 1, 0, 0),
-    "vkRT",
-    VK_MAKE_API_VERSION(0, 1, 0, 0),
-    VK_API_VERSION_1_3
+    .pNext{},
+    .pApplicationName{ "vkRT Application" },
+    .applicationVersion{ VK_MAKE_API_VERSION(0, 1, 0, 0) },
+    .pEngineName{ "vkRT" },
+    .engineVersion{ VK_MAKE_API_VERSION(0, 1, 0, 0) },
+    .apiVersion{ VK_MAKE_API_VERSION(0, 1, 3, 0) }
   };
 
   // Query extensions supported by this installation of Vulkan
@@ -170,12 +171,12 @@ bool Application::CreateVulkanInstance() {
 
   // Create instance info
   const vk::InstanceCreateInfo instance_create_info{
-    {},
-    { &application_info },
-    {},
-    {},
-    static_cast<uint32_t>(required_extensions.size()),
-    required_extensions.data()
+    .pNext{},
+    .pApplicationInfo{ &application_info },
+    .enabledLayerCount{},
+    .ppEnabledLayerNames{},
+    .enabledExtensionCount{ static_cast<uint32_t>(required_extensions.size()) },
+    .ppEnabledExtensionNames{ required_extensions.data() }
   };
 
   // Attempt to create instance and return result
