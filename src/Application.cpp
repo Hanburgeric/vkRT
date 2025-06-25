@@ -14,8 +14,7 @@
 #include "SDL3/SDL_vulkan.h"
 
 // vulkan
-VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
-#include "vulkan/vulkan.hpp"
+#include "vulkan/vulkan_raii.hpp"
 
 namespace vkrt {
 
@@ -97,9 +96,6 @@ bool Application::InitializePlatform() {
 }
 
 bool Application::InitializeRenderer() {
-  // Initialize Vulkan dispatcher
-  VULKAN_HPP_DEFAULT_DISPATCHER.init();
-
   // Create Vulkan instance
   if (!CreateVulkanInstance()) {
     spdlog::error("Failed to create Vulkan instance.");
@@ -107,9 +103,6 @@ bool Application::InitializeRenderer() {
   } else {
     spdlog::info("Vulkan instance created.");
   }
-
-  // Initialize Vulkan dispatcher with created instance
-  VULKAN_HPP_DEFAULT_DISPATCHER.init(vk_instance_.get());
 
   // Create Vulkan debug messenger
   if (!CreateVulkanDebugMessenger()) {
@@ -161,7 +154,7 @@ bool Application::CreateVulkanInstance() {
 
     // Query layers supported by this installation of Vulkan
     const std::vector<vk::LayerProperties> supported_layers{
-      vk::enumerateInstanceLayerProperties()
+      vk_context_.enumerateInstanceLayerProperties()
     };
 
     spdlog::info("Supported Vulkan instance layers:");
@@ -221,7 +214,7 @@ bool Application::CreateVulkanInstance() {
 
     // Query extensions supported by this installation of Vulkan
     const std::vector<vk::ExtensionProperties> supported_extensions{
-      vk::enumerateInstanceExtensionProperties()
+      vk_context_.enumerateInstanceExtensionProperties()
     };
 
     spdlog::info("Supported Vulkan instance extensions:");
@@ -266,7 +259,7 @@ bool Application::CreateVulkanInstance() {
 
   // Attempt to create instance and return result
   try {
-    vk_instance_ = vk::createInstanceUnique(instance_create_info);
+    vk_instance_ = vk_context_.createInstance(instance_create_info);
     return true;
   } catch (const vk::SystemError& e) {
     spdlog::error(e.what());
@@ -293,7 +286,7 @@ bool Application::CreateVulkanDebugMessenger() {
   // Attempt to create debug messenger and return result
   try {
     vk_debug_messenger_ =
-      vk_instance_->createDebugUtilsMessengerEXTUnique(debug_messenger_info);
+      vk_instance_.createDebugUtilsMessengerEXT(debug_messenger_info);
     return true;
   } catch (const vk::SystemError& e) {
     spdlog::error(e.what());
@@ -336,17 +329,13 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Application::VulkanDebugMessageCallback(
 }
 
 void Application::ShutdownRenderer() {
-  // Destroy Vulkan debug messenger
-  if (vk_debug_messenger_) {
-    vk_debug_messenger_.reset();
-    spdlog::info("Vulkan debug messenger destroyed.");
-  }
+  // Destroy debug messenger
+  vk_debug_messenger_.clear();
+  spdlog::info("Vulkan debug messenger destroyed.");
 
-  // Destroy Vulkan instance
-  if (vk_instance_) {
-    vk_instance_.reset();
-    spdlog::info("Vulkan instance destroyed.");
-  }
+  // Destroy instance
+  vk_instance_.clear();
+  spdlog::info("Vulkan instance destroyed.");
 }
 
 void Application::ShutdownPlatform() {

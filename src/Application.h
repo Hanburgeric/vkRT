@@ -8,7 +8,7 @@
 #include "SDL3/SDL.h"
 
 // vulkan
-#include "vulkan/vulkan.hpp"
+#include "vulkan/vulkan_raii.hpp"
 
 namespace vkrt {
 
@@ -49,8 +49,9 @@ private:
                   decltype(&SDL_DestroyWindow)> window_{ nullptr, nullptr };
   bool should_quit_{ false };
 
-  vk::UniqueInstance vk_instance_{ nullptr };
-  vk::UniqueDebugUtilsMessengerEXT vk_debug_messenger_{ nullptr };
+  vk::raii::Context vk_context_{};
+  vk::raii::Instance vk_instance_{ nullptr };
+  vk::raii::DebugUtilsMessengerEXT vk_debug_messenger_{ nullptr };
 };
 
 } // namespace vkrt

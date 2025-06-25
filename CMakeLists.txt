@@ -107,7 +107,6 @@ target_link_libraries(
 target_compile_definitions(
     ${PROJECT_NAME} PRIVATE
         VULKAN_HPP_NO_CONSTRUCTORS
-        VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
 )
 
 # ======================================================================
