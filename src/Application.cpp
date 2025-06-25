@@ -14,6 +14,7 @@
 #include "SDL3/SDL_vulkan.h"
 
 // vulkan
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "vulkan/vulkan.hpp"
 
 namespace vkrt {
@@ -96,17 +97,47 @@ bool Application::InitializePlatform() {
 }
 
 bool Application::InitializeRenderer() {
+  // Initialize Vulkan dispatcher
+  VULKAN_HPP_DEFAULT_DISPATCHER.init();
+
+  // Create Vulkan instance
   if (!CreateVulkanInstance()) {
     spdlog::error("Failed to create Vulkan instance.");
-    return false;;
+    return false;
   } else {
     spdlog::info("Vulkan instance created.");
+  }
+
+  // Initialize Vulkan dispatcher with created instance
+  VULKAN_HPP_DEFAULT_DISPATCHER.init(vk_instance_.get());
+
+  // Create Vulkan debug messenger
+  if (!CreateVulkanDebugMessenger()) {
+    spdlog::error("Failed to create Vulkan debug messenger.");
+    return false;
+  } else {
+    spdlog::info("Vulkan debug messenger created.");
   }
 
   return true;
 }
 
 bool Application::CreateVulkanInstance() {
+  // Create (temporary) debug messenger info
+  constexpr vk::DebugUtilsMessengerCreateInfoEXT debug_messenger_info{
+    .pNext{},
+    .flags{},
+    .messageSeverity{ vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError },
+    .messageType{ vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
+                  | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation
+                  | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance },
+    .pfnUserCallback{ VulkanDebugMessageCallback },
+    .pUserData{}
+  };
+
   // Create application info
   constexpr vk::ApplicationInfo application_info{
     .pNext{},
@@ -119,11 +150,7 @@ bool Application::CreateVulkanInstance() {
 
   // Add layers required by the application
   std::vector<const char*> required_layers{};
-#ifndef NDEBUG
-  required_layers.emplace_back(
-    "VK_LAYER_KHRONOS_validation"
-  );
-#endif
+  required_layers.emplace_back("VK_LAYER_KHRONOS_validation");
 
   // If any layers are required, check whether they are available
   if (!required_layers.empty()) {
@@ -161,7 +188,7 @@ bool Application::CreateVulkanInstance() {
     if (!missing_layers.empty()) {
       spdlog::info("Missing Vulkan instance layers:");
       for (const std::string& layer : missing_layers) {
-        spdlog::info("  {}", layer);
+        spdlog::warn("  {}", layer);
       }
       return false;
     }
@@ -169,6 +196,7 @@ bool Application::CreateVulkanInstance() {
 
   // Add extensions required by the application
   std::vector<const char*> required_extensions{};
+  required_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
   // Query extensions required by SDL3
   uint32_t required_extension_count{};
@@ -220,7 +248,7 @@ bool Application::CreateVulkanInstance() {
     if (!missing_extensions.empty()) {
       spdlog::info("Missing Vulkan instance extensions:");
       for (const std::string& extension : missing_extensions) {
-        spdlog::info("  {}", extension);
+        spdlog::warn("  {}", extension);
       }
       return false;
     }
@@ -228,7 +256,7 @@ bool Application::CreateVulkanInstance() {
 
   // Create instance info
   const vk::InstanceCreateInfo instance_create_info{
-    .pNext{},
+    .pNext{ &debug_messenger_info },
     .pApplicationInfo{ &application_info },
     .enabledLayerCount{ static_cast<uint32_t>(required_layers.size()) },
     .ppEnabledLayerNames{ required_layers.data() },
@@ -246,7 +274,75 @@ bool Application::CreateVulkanInstance() {
   }
 }
 
+bool Application::CreateVulkanDebugMessenger() {
+  // Create debug messenger info
+  constexpr vk::DebugUtilsMessengerCreateInfoEXT debug_messenger_info{
+    .pNext{},
+    .flags{},
+    .messageSeverity{ vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning
+                      | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError },
+    .messageType{ vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
+                  | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation
+                  | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance },
+    .pfnUserCallback{ VulkanDebugMessageCallback },
+    .pUserData{}
+  };
+
+  // Attempt to create debug messenger and return result
+  try {
+    vk_debug_messenger_ =
+      vk_instance_->createDebugUtilsMessengerEXTUnique(debug_messenger_info);
+    return true;
+  } catch (const vk::SystemError& e) {
+    spdlog::error(e.what());
+    return false;
+  }
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL Application::VulkanDebugMessageCallback(
+  vk::DebugUtilsMessageSeverityFlagBitsEXT message_severity,
+  vk::DebugUtilsMessageTypeFlagsEXT message_type,
+  const vk::DebugUtilsMessengerCallbackDataEXT* callback_data,
+  void* user_data
+) {
+  switch (message_severity) {
+    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose: {
+      spdlog::debug(callback_data->pMessage);
+      break;
+    }
+    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo: {
+      spdlog::info(callback_data->pMessage);
+      break;
+    }
+    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning: {
+      spdlog::warn(callback_data->pMessage);
+      break;
+    }
+    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eError: {
+      spdlog::error(callback_data->pMessage);
+      break;
+    }
+    default: {
+      spdlog::trace("[unknown] {}", callback_data->pMessage);
+      break;
+    }
+  }
+
+  spdlog::info(callback_data->pMessage);
+
+  return VK_FALSE;
+}
+
 void Application::ShutdownRenderer() {
+  // Destroy Vulkan debug messenger
+  if (vk_debug_messenger_) {
+    vk_debug_messenger_.reset();
+    spdlog::info("Vulkan debug messenger destroyed.");
+  }
+
+  // Destroy Vulkan instance
   if (vk_instance_) {
     vk_instance_.reset();
     spdlog::info("Vulkan instance destroyed.");

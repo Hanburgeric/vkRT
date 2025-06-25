@@ -32,6 +32,13 @@ private:
 
   bool InitializeRenderer();
   bool CreateVulkanInstance();
+  bool CreateVulkanDebugMessenger();
+  static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugMessageCallback(
+    vk::DebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    vk::DebugUtilsMessageTypeFlagsEXT message_type,
+    const vk::DebugUtilsMessengerCallbackDataEXT* callback_data,
+    void* user_data
+  );
 
   void ShutdownRenderer();
   void ShutdownPlatform();
@@ -43,6 +50,7 @@ private:
   bool should_quit_{ false };
 
   vk::UniqueInstance vk_instance_{ nullptr };
+  vk::UniqueDebugUtilsMessengerEXT vk_debug_messenger_{ nullptr };
 };
 
 } // namespace vkrt
